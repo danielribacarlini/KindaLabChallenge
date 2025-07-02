@@ -1,0 +1,32 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/dist/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Angular / Node
+node_modules/
+.angular/
+.env
+
+# Logs
+*.log
+
+# Compiled output
+*.dll
+*.exe
+*.js
+*.js.map
+*.tsbuildinfo
+
+# Visual Studio user-specific files
+.vs/

@@ -1,0 +1,11 @@
+FROM node:20-alpine AS build
+WORKDIR /app
+
+COPY FoodTruck.Web/package*.json ./
+RUN npm install
+
+COPY FoodTruck.Web/ ./
+RUN npm run build --prod
+
+FROM nginx:alpine
+COPY --from=build /app/dist/FoodTruck.Web/browser /usr/share/nginx/html
