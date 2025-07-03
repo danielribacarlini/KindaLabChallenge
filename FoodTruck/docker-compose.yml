@@ -1,18 +1,18 @@
-version: '3.8'
 services:
   api:
     build:
-      context: .
-      dockerfile: Dockerfile.api
+      context: ./FoodTruck.Api
+      dockerfile: Dockerfile
     ports:
-      - "5000:80"
+      - "5000:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+    command: ["dotnet", "FoodTruck.Api.dll"]
 
   web:
     build:
-      context: .
-      dockerfile: Dockerfile.web
+      context: ./FoodTruck.Web
+      dockerfile: Dockerfile
     ports:
       - "4200:80"
     depends_on:

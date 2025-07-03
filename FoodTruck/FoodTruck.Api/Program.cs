@@ -26,6 +26,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddHttpClient<FoodTruckService>();
+builder.Services.AddMemoryCache();
 
 builder.WebHost.UseUrls("http://*:5000");
 var app = builder.Build();

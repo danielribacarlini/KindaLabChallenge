@@ -2,7 +2,7 @@
 {
     public static class Categories
     {
-        public static readonly Dictionary<string, string> _categoryMapping = new()
+        public static readonly Dictionary<string, string> CategoryMapping = new()
         {
             // Mexican Food
             { "taco", "Mexican Food" },
@@ -106,5 +106,12 @@
             { "popcorn", "Snacks" },
             { "granola", "Snacks" }
         };
+    }
+
+    public static class ServiceConstants
+    {
+        public const string FoodTrucksCacheKey = "allFoodTrucks";
+        public const string SFFoodTrucksApiUrl = "https://data.sfgov.org/resource/rqzj-sfat.json";
+        public const Double FoodTruckRadius = 10.0;
     }
 }

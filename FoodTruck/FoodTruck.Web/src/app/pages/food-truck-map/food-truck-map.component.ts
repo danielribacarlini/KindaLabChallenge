@@ -1,5 +1,4 @@
 import { Component, signal, inject, viewChild, viewChildren, computed, effect } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FoodTruckService } from '../../services/food-truck.service';
 import { FoodTruck } from '../../models/food-truck.model';
 import { GoogleMap, MapAdvancedMarker, MapInfoWindow } from '@angular/google-maps';
@@ -22,6 +21,9 @@ export class FoodTruckMapComponent {
   get selectedMap() {
     return this.selectedCategoriesMap();
   }
+
+  center = signal<google.maps.LatLngLiteral>({lat: 37.7749, lng: -122.4194});
+  zoom = signal(12);
 
   constructor() {
     effect(() => {
@@ -55,9 +57,6 @@ export class FoodTruckMapComponent {
     { name: 'Soups', icon: '🍲' },
     { name: 'Snacks', icon: '🍿' }
   ];
-  
-  center = signal<google.maps.LatLngLiteral>({lat: 37.7749, lng: -122.4194});
-  zoom = signal(12);
 
   selectedCategories = signal<string[]>([]);
   selectedCategoriesMap = signal<{ [key: string]: boolean }>({});
@@ -85,24 +84,15 @@ export class FoodTruckMapComponent {
   }
   
   // Map functions
-
   infoWindow = viewChild.required(MapInfoWindow);
   markersRef = viewChildren(MapAdvancedMarker);
 
   selectedTruck = signal<FoodTruck | null>(null);
 
-openInfoWindow(foodtruck: FoodTruck, marker: MapAdvancedMarker){
-  this.selectedTruck.set(foodtruck);
-  this.infoWindow().open(marker);
-}
-
-  // openInfoWindow(foodtruck: FoodTruck, marker: MapAdvancedMarker){
-  //   const content = `
-  //     <h1 class="font-bold text-kl">${foodtruck.applicant}</h1>
-  //     <p>${foodtruck.locationDescription}</p>
-  //   `;
-  //   this.infoWindow().open(marker, false, content);
-  // }
+  openInfoWindow(foodtruck: FoodTruck, marker: MapAdvancedMarker){
+    this.selectedTruck.set(foodtruck);
+    this.infoWindow().open(marker);
+  }
 
   goToPoint(foodTruck: FoodTruck, position: number){
     const markers = this.markersRef();

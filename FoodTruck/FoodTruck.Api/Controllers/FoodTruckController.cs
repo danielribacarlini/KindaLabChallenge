@@ -1,4 +1,5 @@
-﻿using FoodTruck.Api.Interfaces;
+﻿using FoodTruck.Api.Constants;
+using FoodTruck.Api.Interfaces;
 using FoodTruck.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ public class FoodTruckController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get(double lat, double lng, [FromQuery] List<string>? categories = null)
     {
-        var results = await _service.GetNearbyTrucksAsync(lat, lng, categories);
+        var results = await _service.GetNearbyTrucksAsync(lat, lng, categories, ServiceConstants.FoodTruckRadius);
         return Ok(results);
     }
 }

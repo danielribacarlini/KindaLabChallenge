@@ -1,50 +1,38 @@
-﻿using System.Net.Http.Json;
+﻿using System.Data;
 using FoodTruck.Api.Constants;
 using FoodTruck.Api.DTOs;
 using FoodTruck.Api.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FoodTruck.Api.Services;
 
 public class FoodTruckService : IFoodTruckService
 {
     private readonly HttpClient _httpClient;
+    private readonly IMemoryCache _memoryCache;
 
-    public FoodTruckService(HttpClient httpClient)
+    public FoodTruckService(HttpClient httpClient, IMemoryCache memoryCache)
     {
         _httpClient = httpClient;
+        _memoryCache = memoryCache;
     }
 
-    public async Task<IEnumerable<FoodTruckDto>> GetNearbyTrucksAsync(double lat, double lng, IEnumerable<string>? categories = null, double radiusKm = 100.0)
+    public async Task<IEnumerable<FoodTruckDto>> GetNearbyTrucksAsync(
+        double lat,     
+        double lng,     
+        IEnumerable<string>? categories = null, 
+        double radiusKm = 10.0)
     {
-        var all = await _httpClient.GetFromJsonAsync<List<FoodTruckDto>>("https://data.sfgov.org/resource/rqzj-sfat.json");
+        // Try to get the cache
+        var all = await GetOrFetchFoodTrucksAsync();
 
-        if (all == null)
-            return Enumerable.Empty<FoodTruckDto>();
-
-        // Siempre llenamos FoodItemsList
-        foreach (var t in all)
-        {
-            if (!string.IsNullOrWhiteSpace(t.FoodItems))
-            {
-                t.FoodItemsList = t.FoodItems
-                    .ToLowerInvariant()
-                    .Split(new[] { ',', ':', ';' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(i => i.Trim())
-                    .ToList();
-            }
-            else
-            {
-                t.FoodItemsList = new List<string>();
-            }
-        }
-
-        // Filtro de proximidad
+        // Proximity filter
         var nearby = all.Where(t =>
             t.Latitude.HasValue && t.Longitude.HasValue &&
             GetDistanceKm(lat, lng, t.Latitude.Value, t.Longitude.Value) <= radiusKm
         );
 
-        // Filtro por categorías
+        // Category filter
         if (categories != null && categories.Any())
         {
             var categorySet = new HashSet<string>(categories, StringComparer.OrdinalIgnoreCase);
@@ -55,8 +43,8 @@ public class FoodTruckService : IFoodTruckService
                     return false;
 
                 var itemCategories = t.FoodItemsList
-                    .Where(i => Categories._categoryMapping.ContainsKey(i))
-                    .Select(i => Categories._categoryMapping[i]);
+                    .Where(i => Categories.CategoryMapping.ContainsKey(i))
+                    .Select(i => Categories.CategoryMapping[i]);
 
                 return itemCategories.Any(cat => categorySet.Contains(cat));
             });
@@ -64,9 +52,37 @@ public class FoodTruckService : IFoodTruckService
 
         return nearby;
     }
+
+    private async Task<List<FoodTruckDto>> GetOrFetchFoodTrucksAsync()
+    {
+        if (_memoryCache.TryGetValue(ServiceConstants.FoodTrucksCacheKey, out List<FoodTruckDto>? cachedList))
+        {
+            return cachedList!;
+        }
+
+        var all = await _httpClient.GetFromJsonAsync<List<FoodTruckDto>>(ServiceConstants.SFFoodTrucksApiUrl);
+
+        if (all == null)
+            return new List<FoodTruckDto>();
+
+        foreach (var t in all)
+        {
+            t.FoodItemsList = string.IsNullOrWhiteSpace(t.FoodItems)
+                ? new List<string>()
+                : t.FoodItems
+                    .ToLowerInvariant()
+                    .Split(new[] { ',', ':', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(i => i.Trim())
+                    .ToList();
+        }
+
+        _memoryCache.Set(ServiceConstants.FoodTrucksCacheKey, all);
+        return all;
+    }
+
     private double GetDistanceKm(double lat1, double lon1, double lat2, double lon2)
     {
-        var R = 6371; // Radio de la Tierra en km
+        var R = 6371; // Earth radius in Km
         var dLat = DegreesToRadians(lat2 - lat1);
         var dLon = DegreesToRadians(lon2 - lon1);
 
