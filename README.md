@@ -33,8 +33,9 @@ A full-stack web application that allows users to explore food trucks in San Fra
 ### 1. Clone the repository
 
 ```  bash
-git clone https://github.com/your-username/foodtruck-app.git
-cd foodtruck-app
+git clone https://github.com/danielribacarlini/SF-FoodTrucks-locator.git
+git checkout food-truck-locator
+cd foodtruck
 ```
 
 ---
@@ -142,7 +143,7 @@ dotnet test
 
 **Daniel Riba**\
 Senior .NET & Angular Developer\
-📧 [Your LinkedIn or email here, if you'd like to include it]
+📧 danielribacarlini@gmail.com
 
 ---
 
