@@ -1,0 +1,11 @@
+<div class="max-w-xs px-2 pb-2 pt-0 text-sm text-gray-800 m-0">
+  <h2 class="font-semibold text-base mt-0">{{ foodTruck.applicant }}</h2>
+  <p class="mb-2 text-gray-600">{{ foodTruck.locationDescription }}</p>
+
+  <div *ngIf="foodTruck.foodItemsList?.length">
+    <h3 class="font-semibold mb-1">Items:</h3>
+    <ul class="list-disc list-inside space-y-0.5">
+      <li *ngFor="let item of foodTruck.foodItemsList">{{ item }}</li>
+    </ul>
+  </div>
+</div>

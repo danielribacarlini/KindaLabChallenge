@@ -1,0 +1,48 @@
+<nav class="shadow-md">
+  <div class="max-w-8xl mx-auto px-4 sm:px-6 md:px-8">
+  <div class="w-full flex flex-wrap items-center justify-between mx-auto py-4">
+    <div class="flex items-center space-x-8">
+      <a class="flex items-center">
+        <img
+          src="https://www.svgrepo.com/show/436425/foodtruck-right.svg"
+          class="h-6 mr-3"
+          alt="Flowbite Logo"
+        />
+        <span class="self-center text-xl font-semibold whitespace-nowrap"
+          >SF FoodTrucks locator</span
+        >
+      </a>
+      <ul class="flex space-x-6">
+        <li>
+          <a
+            routerLink="/"
+            routerLinkActive="underline"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="block hover:underline"
+            aria-current="page"
+            >Home</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/foodtrucks"
+            routerLinkActive="underline"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="block hover:underline"
+            aria-current="page"
+            >FoodTrucks</a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+</nav>
+
+<div
+  class="fixed border-l-4 top-0 right-0 bg-red z-40 w-72 h-screen p-4 overflow-y-auto transition-transform bg-white"
+  [class.translate-x-full]="hideSideMenu()"
+>
+  <div class="pt-4 flex flex-col">
+  </div>
+</div>

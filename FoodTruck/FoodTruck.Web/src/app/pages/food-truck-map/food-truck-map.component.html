@@ -1,0 +1,77 @@
+<!-- Barra superior con filtros de categoría centrados y compactos -->
+<div class="overflow-x-auto whitespace-nowrap bg-white border-b border-gray-200 shadow-sm">
+  <div class="flex justify-center items-center px-2 py-3 space-x-2 min-w-fit">
+    <label
+      *ngFor="let category of categories"
+      class="flex items-center gap-1 px-2 py-1 text-xs rounded cursor-pointer transition"
+      [ngClass]="{
+        'bg-gray-200': selectedMap[category.name],
+        'hover:bg-gray-100': !selectedMap[category.name]
+      }"
+    >
+      <input
+        #cb
+        type="checkbox"
+        [checked]="selectedCategoriesMap()[category.name]"
+        (change)="toggleCategory(category.name, cb.checked)"
+        class="hidden"
+      />
+      <span [innerHTML]="category.icon" class="text-sm"></span>
+      <span class="truncate max-w-[5.5rem]">{{ category.name }}</span>
+    </label>
+
+    <button
+      *ngIf="hasSelectedCategories"
+      type="button"
+      class="text-xs px-2 py-1 border rounded text-gray-700 border-gray-300 hover:bg-gray-100"
+      (click)="clearFilters()"
+    >
+      Clear Filters
+    </button>
+  </div>
+</div>
+<div *ngIf="isLoading()" class="absolute inset-0 z-50 flex items-center justify-center bg-white bg-opacity-60">
+  <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-blue-500"></div>
+</div>
+<!-- Contenido principal: lista + mapa -->
+<div class="relative flex space-x-4 h-[calc(100vh-6rem)]">
+  <!-- Columna izquierda: slider + lista -->
+  <div class="h-full w-1/5 flex flex-col space-y-4">
+    <!-- Selector de zoom -->
+    <input type="range" name="zoom" min="0" max="20" class="w-full" [(ngModel)]="zoom" />
+
+    <!-- Lista de FoodTrucks -->
+    <div class="divide-y h-full overflow-auto pr-4">
+      @for (foodTruck of foodTrucks(); track foodTruck) {
+        <div class="max-w-md text-gray-900" aria-hidden="true" (click)="goToPoint(foodTruck, $index)">
+          <div class="flex flex-col pb-3">
+            <dt class="mb-1 text-gray-500 md:text-lg 0">{{ foodTruck.applicant }}</dt>
+            <dd class="text-lg font-semibold">{{ foodTruck.locationDescription }}</dd>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Columna derecha: mapa -->
+  <div class="w-4/5">
+    <div class="w-full h-full">
+      <google-map
+        mapId="2041185aa1c8d7482e5290c2"
+        height="100%"
+        width="100%"
+        [center]="center()"
+        [zoom]="zoom()">
+        @for (foodTruck of foodTrucks(); track foodTruck) {
+          <map-advanced-marker 
+            #marker="mapAdvancedMarker"
+            (mapClick)="openInfoWindow(foodTruck, marker)"
+            [position]="{ lat: +foodTruck.latitude, lng: +foodTruck.longitude }" />
+        }
+        <map-info-window>
+          <app-food-truck-info-window *ngIf="selectedTruck() as truck" [foodTruck]="truck" />
+        </map-info-window>
+      </google-map>
+    </div>
+  </div>
+</div>
